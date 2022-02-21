@@ -1,0 +1,24 @@
+﻿  MainDlg.cpp
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(64,32): error C2440: “=”: 无法从“const wchar_t [3]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(64,18): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(70,29): error C2440: “=”: 无法从“const wchar_t [4]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(70,18): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(76,38): error C2440: “=”: 无法从“const wchar_t [5]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(76,18): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(82,38): error C2440: “=”: 无法从“const wchar_t [5]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(82,18): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(101,38): error C2440: “=”: 无法从“const wchar_t [5]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(101,18): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(107,38): error C2440: “=”: 无法从“const wchar_t [5]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(107,18): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(119,45): error C2440: “=”: 无法从“const wchar_t [9]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(119,21): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(124,32): error C2440: “=”: 无法从“const wchar_t [4]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(124,21): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(129,37): error C2440: “=”: 无法从“const wchar_t [9]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(129,21): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(134,37): error C2440: “=”: 无法从“const wchar_t [9]”转换为“LPWSTR”
+H:\cpp_projects\PEViewer\PEViewer\MainDlg.cpp(134,21): message : 从字符串文本转换将丢失 const 限定符(请参阅 /Zc:strictStrings)
+  PEDlg.cpp
+  PEViewer.cpp
+  正在生成代码...

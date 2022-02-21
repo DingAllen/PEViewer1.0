@@ -141,12 +141,14 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainDlg.h" />
+    <ClInclude Include="PEDlg.h" />
     <ClInclude Include="PEViewer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainDlg.cpp" />
+    <ClCompile Include="PEDlg.cpp" />
     <ClCompile Include="PEViewer.cpp" />
   </ItemGroup>
   <ItemGroup>

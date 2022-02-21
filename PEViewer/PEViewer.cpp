@@ -2,13 +2,12 @@
 //
 
 #include "PEViewer.h"
-#include "framework.h"
 #include "MainDlg.h"
 
 #define MAX_LOADSTRING 100
 
 // 全局变量:
-HINSTANCE hInst;                                // 当前实例
+
 WCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
 WCHAR szWindowClass[MAX_LOADSTRING];            // 主窗口类名
 
@@ -29,6 +28,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: 在此处放置代码。
+    hAppInstance = hInstance;
 
     // 初始化全局字符串
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -77,7 +77,6 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 //        创建和显示主程序窗口。
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
-    hInst = hInstance; // 将实例句柄存储在全局变量中
 
     HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
                               CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
@@ -109,7 +108,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
             // 分析菜单选择:
             switch (wmId) {
                 case IDM_ABOUT:
-                    DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                     break;
                 case IDM_EXIT:
                     DestroyWindow(hWnd);

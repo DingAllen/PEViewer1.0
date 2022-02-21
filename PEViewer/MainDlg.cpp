@@ -1,7 +1,11 @@
 #include "MainDlg.h"
+#include "PEDlg.h"
 
 INT_PTR CALLBACK MainDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     UNREFERENCED_PARAMETER(lParam);
+
+    OPENFILENAMEW stOpenFile;
+
     switch (message) {
         case WM_COMMAND: {
             switch (LOWORD(wParam)) {
@@ -11,6 +15,21 @@ INT_PTR CALLBACK MainDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
                 }
                 case IDC_BUTTON_PE: {
 
+                    WCHAR szPeFileExt[128] = L"*.exe;*.dll;*.scr;*.drv;*.sys";
+                    WCHAR szFileName[256];
+                    memset(szFileName, 0, 256 * 2);
+                    memset(&stOpenFile, 0, sizeof(OPENFILENAME));
+                    stOpenFile.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+                    stOpenFile.hwndOwner = hDlg;
+                    stOpenFile.lpstrFilter = szPeFileExt;
+                    stOpenFile.lpstrFile = szFileName;
+                    stOpenFile.lStructSize = sizeof(OPENFILENAME);
+                    stOpenFile.nMaxFile = MAX_PATH;
+
+                    GetOpenFileNameW(&stOpenFile);
+                    MessageBoxW(0, szFileName, 0, 0);
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_PE), hDlg, PEDlgProc);
+
                     return TRUE;
                 }
                 case IDC_BUTTON_EXIT:
@@ -18,6 +37,8 @@ INT_PTR CALLBACK MainDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
                     EndDialog(hDlg, LOWORD(wParam));
                     return (INT_PTR) TRUE;
                 }
+                default:
+                    return FALSE;
             }
             break;
         }
@@ -26,6 +47,8 @@ INT_PTR CALLBACK MainDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
             InitModuleListView(hDlg);
             break;
         }
+        default:
+            return FALSE;
     }
     return (INT_PTR) FALSE;
 }
@@ -96,7 +119,7 @@ VOID EnumProcess(HWND hListProcess) {
     memset(&vitem, 0, sizeof(LV_ITEM));
     vitem.mask = LVIF_TEXT;
 
-    vitem.pszText = TEXT("csrss.exe");
+    vitem.pszText = TEXT("Ê¾Àý½ø³Ì.exe");
     vitem.iItem = 0;
     vitem.iSubItem = 0;
     SendMessage(hListProcess, LVM_INSERTITEM, 0, (LPARAM) &vitem);
@@ -106,12 +129,12 @@ VOID EnumProcess(HWND hListProcess) {
     vitem.iSubItem = 1;
     ListView_SetItem(hListProcess, &vitem);
 
-    vitem.pszText = TEXT("448");
+    vitem.pszText = TEXT("10000000");
     vitem.iItem = 0;
     vitem.iSubItem = 2;
     ListView_SetItem(hListProcess, &vitem);
 
-    vitem.pszText = TEXT("448");
+    vitem.pszText = TEXT("00F00000");
     vitem.iItem = 0;
     vitem.iSubItem = 3;
     ListView_SetItem(hListProcess, &vitem);
