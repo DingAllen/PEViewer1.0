@@ -1,4 +1,6 @@
 ﻿  MainDlg.cpp
   PEDlg.cpp
   正在生成代码...
-  PEViewer.vcxproj -> H:\cpp_projects\PEViewer\x64\Debug\PEViewer.exe
+PEDlg.obj : error LNK2019: 无法解析的外部符号 "void * __cdecl ReadPEFile(char *)" (?ReadPEFile@@YAPEAXPEAD@Z)，函数 "__int64 __cdecl PEDlgProc(struct HWND__ *,unsigned int,unsigned __int64,__int64)" (?PEDlgProc@@YA_JPEAUHWND__@@I_K_J@Z) 中引用了该符号
+PEHelperLib.lib : warning LNK4272: 库计算机类型“x86”与目标计算机类型“x64”冲突
+H:\cpp_projects\PEViewer\x64\Debug\PEViewer.exe : fatal error LNK1120: 1 个无法解析的外部命令

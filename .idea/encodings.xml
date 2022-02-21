@@ -3,5 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/PEViewer/MainDlg.cpp" charset="GBK" />
     <file url="file://$PROJECT_DIR$/PEViewer/PEDlg.cpp" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/PEViewer/PETool.cpp" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/PEViewer/PETool.h" charset="GBK" />
   </component>
 </project>
