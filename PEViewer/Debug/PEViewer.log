@@ -1,4 +1,10 @@
-﻿  PEDlg.cpp
-H:\cpp_projects\PEViewer\PEViewer\PEDlg.cpp(128,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-H:\cpp_projects\PEViewer\PEViewer\PEDlg.cpp(137,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+﻿  DirectoryDlg.cpp
+  MainDlg.cpp
+  PEDlg.cpp
+H:\cpp_projects\PEViewer\PEViewer\PEDlg.cpp(17,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEDlg.cpp(18,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEDlg.cpp(173,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEDlg.cpp(182,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  PEViewer.cpp
+  正在生成代码...
   PEViewer.vcxproj -> H:\cpp_projects\PEViewer\Debug\PEViewer.exe

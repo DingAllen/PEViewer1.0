@@ -1,17 +1,62 @@
 #include "PEDlg.h"
-#include "DirectoryDlg.h"
 
 HWND hPEDlg;
 HWND hSectionDlg;
+HWND hDirectoryDlg;
 HWND hListSection;
 PIMAGE_HEADER_POINTERS pImageHeaders;
 
-LV_ITEM vitem;
+LV_ITEMW vitem;
+
+VOID SetRvaAndSize(int rvaItem, int sizeItem, DWORD rva, DWORD size) {
+
+    CHAR lpString1[256];
+    CHAR lpString2[256];
+    memset(lpString1, 0, 256);
+    memset(lpString2, 0, 256);
+    sprintf(lpString1, "%08lX", rva);
+    sprintf(lpString2, "%08lX", size);
+    
+
+    SetDlgItemTextA(hDirectoryDlg, rvaItem, lpString1);
+    SetDlgItemTextA(hDirectoryDlg, sizeItem, lpString2);
+}
+
+INT_PTR CALLBACK DirectoryDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+    UNREFERENCED_PARAMETER(lParam);
+
+    hDirectoryDlg = hDlg;
+
+    switch (message) {
+        case WM_COMMAND: {
+            switch (LOWORD(wParam)) {
+                case IDCANCEL: {
+                    EndDialog(hDlg, LOWORD(wParam));
+                    return (INT_PTR) TRUE;
+                }
+            }
+            break;
+        }
+        case WM_INITDIALOG: {
+            PIMAGE_DATA_DIRECTORY pImageDataDirectory = pImageHeaders->pOptionHeader->DataDirectory;
+
+            SetRvaAndSize(IDC_EDIT_RVAEXPORT, IDC_EDIT_SIZEEXPORT,
+                          pImageDataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress,
+                          pImageDataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size);
+            SetRvaAndSize(IDC_EDIT_RVAIMPORT, IDC_EDIT_SIZEIMPORT,
+                          pImageDataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress,
+                          pImageDataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size);
+            
+            return TRUE;
+        }
+    }
+    return (INT_PTR) FALSE;
+}
 
 VOID SetItem(int index, int subIndex, DWORD data) {
-    TCHAR lpString[256];
+    WCHAR lpString[256];
     memset(lpString, 0, 256);
-    wsprintf(lpString, L"%08lX", data);
+    wsprintfW(lpString, L"%08lX", data);
 
     vitem.pszText = (LPWSTR)lpString;
     vitem.iItem = index;
@@ -23,7 +68,7 @@ VOID InsertItem(int index, BYTE *name) {
 
     WCHAR lpString[256];
     memset(lpString, 0, 256);
-    wsprintf(lpString, L"%S", (PSTR)name);
+    wsprintfW(lpString, L"%S", (PSTR)name);
 
     vitem.pszText = (LPWSTR)lpString;
     vitem.iItem = index;

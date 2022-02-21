@@ -46,8 +46,46 @@
 #define IDC_EDIT_CHECKSUM               1021
 #define IDC_BUTTON_SECTION              1022
 #define IDC_BUTTON_DIRECTORY            1023
-#define IDC_LIST2                       1024
 #define IDC_LIST_SECTION                1024
+#define IDC_EDIT_RVAEXPORT              1025
+#define IDC_EDIT2                       1026
+#define IDC_EDIT_RVAIMPORT              1027
+#define IDC_EDIT4                       1028
+#define IDC_EDIT5                       1029
+#define IDC_EDIT6                       1030
+#define IDC_EDIT7                       1031
+#define IDC_EDIT8                       1032
+#define IDC_EDIT9                       1033
+#define IDC_EDIT10                      1034
+#define IDC_EDIT11                      1035
+#define IDC_EDIT12                      1036
+#define IDC_BUTTON1                     1037
+#define IDC_EDIT13                      1043
+#define IDC_EDIT14                      1044
+#define IDC_EDIT15                      1045
+#define IDC_EDIT16                      1046
+#define IDC_EDIT_SIZEEXPORT             1047
+#define IDC_EDIT18                      1048
+#define IDC_EDIT19                      1049
+#define IDC_EDIT_SIZEIMPORT             1049
+#define IDC_EDIT20                      1050
+#define IDC_EDIT21                      1051
+#define IDC_EDIT22                      1052
+#define IDC_EDIT23                      1053
+#define IDC_EDIT24                      1054
+#define IDC_EDIT25                      1055
+#define IDC_EDIT26                      1056
+#define IDC_EDIT27                      1057
+#define IDC_EDIT28                      1058
+#define IDC_EDIT29                      1059
+#define IDC_EDIT30                      1060
+#define IDC_EDIT31                      1061
+#define IDC_EDIT32                      1062
+#define IDC_BUTTON2                     1063
+#define IDC_BUTTON3                     1064
+#define IDC_BUTTON4                     1065
+#define IDC_BUTTON5                     1066
+#define IDC_BUTTON6                     1067
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -57,7 +95,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1025
+#define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
