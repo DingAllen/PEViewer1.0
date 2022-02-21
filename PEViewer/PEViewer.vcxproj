@@ -140,19 +140,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DirectoryDlg.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainDlg.h" />
     <ClInclude Include="PEDlg.h" />
     <ClInclude Include="PETool.h" />
     <ClInclude Include="PEViewer.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SectionDlg.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DirectoryDlg.cpp" />
     <ClCompile Include="MainDlg.cpp" />
     <ClCompile Include="PEDlg.cpp" />
     <ClCompile Include="PETool.cpp" />
     <ClCompile Include="PEViewer.cpp" />
+    <ClCompile Include="SectionDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PEViewer.rc" />

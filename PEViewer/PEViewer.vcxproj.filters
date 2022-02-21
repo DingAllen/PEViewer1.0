@@ -36,6 +36,12 @@
     <ClInclude Include="PETool.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DirectoryDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SectionDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PEViewer.cpp">
@@ -48,6 +54,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="PETool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectoryDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SectionDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

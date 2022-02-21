@@ -22,8 +22,6 @@ INT_PTR CALLBACK MainDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
                     EndDialog(hDlg, LOWORD(wParam));
                     return (INT_PTR) TRUE;
                 }
-                default:
-                    return FALSE;
             }
             break;
         }

@@ -1,6 +1,125 @@
 #include "PEDlg.h"
+#include "DirectoryDlg.h"
 
 HWND hPEDlg;
+HWND hSectionDlg;
+HWND hListSection;
+PIMAGE_HEADER_POINTERS pImageHeaders;
+
+LV_ITEM vitem;
+
+VOID SetItem(int index, int subIndex, DWORD data) {
+    TCHAR lpString[256];
+    memset(lpString, 0, 256);
+    wsprintf(lpString, L"%08lX", data);
+
+    vitem.pszText = (LPWSTR)lpString;
+    vitem.iItem = index;
+    vitem.iSubItem = subIndex;
+    ListView_SetItem(hListSection, &vitem);
+}
+
+VOID InsertItem(int index, BYTE *name) {
+
+    WCHAR lpString[256];
+    memset(lpString, 0, 256);
+    wsprintf(lpString, L"%S", (PSTR)name);
+
+    vitem.pszText = (LPWSTR)lpString;
+    vitem.iItem = index;
+    vitem.iSubItem = 0;
+    SendMessage(hListSection, LVM_INSERTITEM, 0, (LPARAM)&vitem);
+}
+
+VOID EnumSection() {
+
+    memset(&vitem, 0, sizeof(LV_ITEM));
+    vitem.mask = LVIF_TEXT;
+
+    PIMAGE_SECTION_HEADER pSectionHeaders = pImageHeaders->pSectionHeaders;
+    WORD numberOfSections = pImageHeaders->pPEHeader->NumberOfSections;
+
+    for (WORD i = 0; i < numberOfSections; i++) {
+        
+        InsertItem(i, pSectionHeaders[i].Name);
+        SetItem(i, 1, pSectionHeaders[i].PointerToRawData);
+        SetItem(i, 2, pSectionHeaders[i].SizeOfRawData);
+        SetItem(i, 3, pSectionHeaders[i].VirtualAddress);
+        SetItem(i, 4, pSectionHeaders[i].Misc.VirtualSize);
+        SetItem(i, 5, pSectionHeaders[i].Characteristics);
+    }
+}
+
+VOID InitSectionListView(HWND hDlg) {
+
+    LV_COLUMN lv;
+
+    memset(&lv, 0, sizeof(LV_COLUMN));
+    hListSection = GetDlgItem(hDlg, IDC_LIST_SECTION);
+    SendMessage(hListSection, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
+
+    // 第一列
+    lv.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+    lv.pszText = TEXT("节名");
+    lv.cx = 100;
+    lv.iSubItem = 0;
+    SendMessage(hListSection, LVM_INSERTCOLUMN, 0, (LPARAM)&lv);
+
+    // 第二列
+    lv.pszText = TEXT("文件偏移");
+    lv.cx = 80;
+    lv.iSubItem = 1;
+    SendMessage(hListSection, LVM_INSERTCOLUMN, 1, (LPARAM)&lv);
+
+    // 第三列
+    lv.pszText = TEXT("文件大小");
+    lv.cx = 80;
+    lv.iSubItem = 2;
+    SendMessage(hListSection, LVM_INSERTCOLUMN, 2, (LPARAM)&lv);
+
+    // 第四列
+    lv.pszText = TEXT("内存偏移");
+    lv.cx = 80;
+    lv.iSubItem = 3;
+    SendMessage(hListSection, LVM_INSERTCOLUMN, 3, (LPARAM)&lv);
+
+    // 第五列
+    lv.pszText = TEXT("内存大小");
+    lv.cx = 80;
+    lv.iSubItem = 4;
+    SendMessage(hListSection, LVM_INSERTCOLUMN, 4, (LPARAM)&lv);
+
+    // 第六列
+    lv.pszText = TEXT("节区属性");
+    lv.cx = 80;
+    lv.iSubItem = 5;
+    SendMessage(hListSection, LVM_INSERTCOLUMN, 5, (LPARAM)&lv);
+
+    EnumSection();
+}
+
+INT_PTR CALLBACK SectionDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+    UNREFERENCED_PARAMETER(lParam);
+
+    hSectionDlg = hDlg;
+
+    switch (message) {
+        case WM_COMMAND: {
+            switch (LOWORD(wParam)) {
+                case IDCANCEL: {
+                    EndDialog(hDlg, LOWORD(wParam));
+                    return (INT_PTR) TRUE;
+                }
+            }
+            break;
+        }
+        case WM_INITDIALOG: {
+            InitSectionListView(hDlg);
+            return TRUE;
+        }
+    }
+    return (INT_PTR) FALSE;
+}
 
 BOOL SetText(int nIDDlgItem, DWORD data) {
 
@@ -33,6 +152,13 @@ INT_PTR CALLBACK PEDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
                     EndDialog(hDlg, LOWORD(wParam));
                     return (INT_PTR) TRUE;
                 }
+                case IDC_BUTTON_SECTION: {
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_SECTION), hDlg, SectionDlgProc);
+                    return TRUE;
+                }
+                case IDC_BUTTON_DIRECTORY: {
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_DIRECTORY), hDlg, DirectoryDlgProc);
+                }
             }
             break;
         }
@@ -49,10 +175,13 @@ INT_PTR CALLBACK PEDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
             stOpenFile.lStructSize = sizeof(OPENFILENAME);
             stOpenFile.nMaxFile = MAX_PATH;
 
-            GetOpenFileNameA(&stOpenFile);
+            if (!GetOpenFileNameA(&stOpenFile)) {
+                EndDialog(hDlg, 0);
+                return FALSE;
+            }
 
             LPVOID pFileBuffer = ReadPEFile(szFileName);
-            PIMAGE_HEADER_POINTERS pImageHeaders = ReadHeaders(pFileBuffer);
+            pImageHeaders = ReadHeaders(pFileBuffer);
 
             SetText(IDC_EDIT_ENTRYPOINT, pImageHeaders->pOptionHeader->AddressOfEntryPoint);
             SetText(IDC_EDIT_IMAGEBASE, pImageHeaders->pOptionHeader->ImageBase);

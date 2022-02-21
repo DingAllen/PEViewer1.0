@@ -12,7 +12,6 @@ LPVOID ReadPEFile(LPSTR lpszFile) {
     //打开文件
     pFile = fopen(lpszFile, "rb");
     if (!pFile) {
-        printf(" 无法打开 PE 文件! ");
         return NULL;
     }
     //读取文件大小
@@ -23,14 +22,12 @@ LPVOID ReadPEFile(LPSTR lpszFile) {
     pFileBuffer = malloc(fileSize);
 
     if (!pFileBuffer) {
-        printf(" 分配空间失败! ");
         fclose(pFile);
         return NULL;
     }
     //将文件数据读取到缓冲区
     size_t n = fread(pFileBuffer, fileSize, 1, pFile);
     if (!n) {
-        printf(" 读取数据失败! ");
         free(pFileBuffer);
         fclose(pFile);
         return NULL;
@@ -47,13 +44,11 @@ LPVOID ReadPEFile(LPSTR lpszFile) {
 PIMAGE_HEADER_POINTERS ReadHeaders(LPVOID pFileBuffer) {
 
     if (!pFileBuffer) {
-        printf("文件读取失败\n");
         return NULL;
     }
 
     //判断是否是有效的MZ标志
     if (*((PWORD)pFileBuffer) != IMAGE_DOS_SIGNATURE) {
-        printf("不是有效的MZ标志\n");
         return NULL;
     }
     PIMAGE_HEADER_POINTERS pImageHeaders = (PIMAGE_HEADER_POINTERS)malloc(sizeof(IMAGE_HEADER_POINTERS));
