@@ -23,7 +23,10 @@ HWND hPEDlg;
 HWND hSectionDlg;
 HWND hDirectoryDlg;
 HWND hListSection;
+LPVOID pFileBuffer;
 PIMAGE_HEADER_POINTERS pImageHeaders;
+
+CHAR info[65535];
 
 int flag = -1;
 enum {
@@ -37,11 +40,16 @@ enum {
 
 LV_ITEMW vitem;
 
+VOID AppendInfo(CHAR *str) {
+    strcat(info, str);
+    strcat(info, "\r\n");
+}
+
 INT_PTR CALLBACK InfoDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     UNREFERENCED_PARAMETER(lParam);
 
     hSectionDlg = hDlg;
-    CHAR info[1024];
+    CHAR temp[128];
     memset(info, 0, 1024);
 
     switch (message) {
@@ -58,7 +66,87 @@ INT_PTR CALLBACK InfoDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 
             switch (flag) {
                 case FLAG_EXPORT: {
-                    SetDlgItemTextA(hDlg, IDC_EDIT_INFO, "导出表");
+                    AppendInfo("导出表");
+                    SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
+                    break;
+                }
+                case FLAG_IMPORT: {
+                    PIMAGE_DATA_DIRECTORY dataDirectory = pImageHeaders->pOptionHeader->DataDirectory;
+                    PIMAGE_IMPORT_DESCRIPTOR pImageImportDescriptor = (PIMAGE_IMPORT_DESCRIPTOR) RVAToPTR(pFileBuffer,
+                                                                                                          dataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+                    AppendInfo("开始打印导入表：");
+
+                    while (pImageImportDescriptor->OriginalFirstThunk != 0) {
+
+                        PDWORD originalFirstThunk = (PDWORD) RVAToPTR(pFileBuffer,
+                                                                      pImageImportDescriptor->OriginalFirstThunk);
+                        PDWORD firstThunk = (PDWORD) RVAToPTR(pFileBuffer, pImageImportDescriptor->FirstThunk);
+                        PSTR name = (PSTR) RVAToPTR(pFileBuffer, pImageImportDescriptor->Name);
+
+                        AppendInfo("===========================================");
+                        sprintf(temp, "%s", name);
+                        AppendInfo(temp);
+
+                        AppendInfo("开始遍历OriginalFirstThunk：");
+                        while (*originalFirstThunk != 0) {
+                            DWORD thunk = *originalFirstThunk;
+                            DWORD flag = (thunk & 0x80000000) >> 31;
+                            if (flag) {
+                                sprintf(temp, "按序号导入：%08lX", thunk & 0x7FFFFFFF);
+                                AppendInfo(temp);
+                            } else {
+                                PIMAGE_IMPORT_BY_NAME pImageImportByName = (PIMAGE_IMPORT_BY_NAME) RVAToPTR(pFileBuffer,
+                                                                                                            thunk);
+                                sprintf(temp, "按名字导入：{Hint: %04X    Name: %s}", pImageImportByName->Hint,
+                                        pImageImportByName->Name);
+                                AppendInfo(temp);
+                            }
+                            originalFirstThunk++;
+                        }
+
+                        AppendInfo("开始遍历FirstThunk：");
+                        while (*firstThunk != 0) {
+                            DWORD thunk = *firstThunk;
+                            DWORD flag = (thunk & 0x80000000) >> 31;
+                            if (flag) {
+                                sprintf(temp, "按序号导入：%08lX", thunk & 0x7FFFFFFF);
+                                AppendInfo(temp);
+                            } else {
+                                PIMAGE_IMPORT_BY_NAME pImageImportByName = (PIMAGE_IMPORT_BY_NAME) RVAToPTR(pFileBuffer,
+                                                                                                            thunk);
+                                sprintf(temp, "按名字导入：{Hint: %04X    Name: %s}", pImageImportByName->Hint,
+                                        pImageImportByName->Name);
+                                AppendInfo(temp);
+                            }
+                            firstThunk++;
+                        }
+
+                        AppendInfo("");
+
+                        pImageImportDescriptor++;
+                    }
+
+                    SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
+                    break;
+                }
+                case FLAG_RESOURCE: {
+                    AppendInfo("资源表");
+                    SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
+                    break;
+                }
+                case FLAG_BASERELOC: {
+                    AppendInfo("重定位表");
+                    SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
+                    break;
+                }
+                case FLAG_BOUNDIMPORT: {
+                    AppendInfo("绑定导入表");
+                    SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
+                    break;
+                }
+                case FLAG_IAT: {
+                    AppendInfo("IAT表");
+                    SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
                     break;
                 }
                 default: {
@@ -99,6 +187,31 @@ INT_PTR CALLBACK DirectoryDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
                 }
                 case IDC_BUTTON_EXPORT: {
                     flag = FLAG_EXPORT;
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_INFO), hDlg, InfoDlgProc);
+                    return TRUE;
+                }
+                case IDC_BUTTON_IMPORT: {
+                    flag = FLAG_IMPORT;
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_INFO), hDlg, InfoDlgProc);
+                    return TRUE;
+                }
+                case IDC_BUTTON_RESOURCE: {
+                    flag = FLAG_RESOURCE;
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_INFO), hDlg, InfoDlgProc);
+                    return TRUE;
+                }
+                case IDC_BUTTON_BASERELOC: {
+                    flag = FLAG_BASERELOC;
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_INFO), hDlg, InfoDlgProc);
+                    return TRUE;
+                }
+                case IDC_BUTTON_BOUNDIMPORT: {
+                    flag = FLAG_BOUNDIMPORT;
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_INFO), hDlg, InfoDlgProc);
+                    return TRUE;
+                }
+                case IDC_BUTTON_IAT: {
+                    flag = FLAG_IAT;
                     DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_INFO), hDlg, InfoDlgProc);
                     return TRUE;
                 }
@@ -335,7 +448,7 @@ INT_PTR CALLBACK PEDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
                 return FALSE;
             }
 
-            LPVOID pFileBuffer = ReadPEFile(szFileName);
+            pFileBuffer = ReadPEFile(szFileName);
             pImageHeaders = ReadHeaders(pFileBuffer);
 
             SetText(IDC_EDIT_ENTRYPOINT, pImageHeaders->pOptionHeader->AddressOfEntryPoint);
@@ -370,7 +483,7 @@ VOID EnumProcess(HWND hListProcess) {
     vitem.pszText = TEXT("csrss.exe");
     vitem.iItem = 0;
     vitem.iSubItem = 0;
-    SendMessage(hListProcess, LVM_INSERTITEM, 0, (LPARAM)&vitem);
+    SendMessage(hListProcess, LVM_INSERTITEM, 0, (LPARAM) &vitem);
 
     vitem.pszText = TEXT("448");
     vitem.iItem = 0;
@@ -402,25 +515,25 @@ VOID InitProcessListView(HWND hDlg) {
     lv.pszText = TEXT("进程");
     lv.cx = 260;
     lv.iSubItem = 0;
-    SendMessage(hListProcess, LVM_INSERTCOLUMN, 0, (LPARAM)&lv);
+    SendMessage(hListProcess, LVM_INSERTCOLUMN, 0, (LPARAM) &lv);
 
     // 第二列
     lv.pszText = TEXT("PID");
     lv.cx = 60;
     lv.iSubItem = 1;
-    SendMessage(hListProcess, LVM_INSERTCOLUMN, 1, (LPARAM)&lv);
+    SendMessage(hListProcess, LVM_INSERTCOLUMN, 1, (LPARAM) &lv);
 
     // 第三列
     lv.pszText = TEXT("镜像基址");
     lv.cx = 100;
     lv.iSubItem = 2;
-    SendMessage(hListProcess, LVM_INSERTCOLUMN, 2, (LPARAM)&lv);
+    SendMessage(hListProcess, LVM_INSERTCOLUMN, 2, (LPARAM) &lv);
 
     // 第四列
     lv.pszText = TEXT("镜像大小");
     lv.cx = 100;
     lv.iSubItem = 3;
-    SendMessage(hListProcess, LVM_INSERTCOLUMN, 3, (LPARAM)&lv);
+    SendMessage(hListProcess, LVM_INSERTCOLUMN, 3, (LPARAM) &lv);
 
     EnumProcess(hListProcess);
 }
@@ -439,13 +552,13 @@ VOID InitModuleListView(HWND hDlg) {
     lv.pszText = TEXT("模块名称");
     lv.cx = 260;
     lv.iSubItem = 0;
-    SendMessage(hListModule, LVM_INSERTCOLUMN, 0, (LPARAM)&lv);
+    SendMessage(hListModule, LVM_INSERTCOLUMN, 0, (LPARAM) &lv);
 
     // 第二列
     lv.pszText = TEXT("模块位置");
     lv.cx = 260;
     lv.iSubItem = 1;
-    SendMessage(hListModule, LVM_INSERTCOLUMN, 1, (LPARAM)&lv);
+    SendMessage(hListModule, LVM_INSERTCOLUMN, 1, (LPARAM) &lv);
 }
 
 INT_PTR CALLBACK MainDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {

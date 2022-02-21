@@ -1,1 +1,13 @@
-﻿  PEViewer.vcxproj -> H:\cpp_projects\PEViewer\Debug\PEViewer.exe
+﻿  PEViewer.cpp
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(44,5): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(45,5): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(87,25): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(95,33): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(100,33): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(112,33): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(117,33): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(168,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(169,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(396,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+H:\cpp_projects\PEViewer\PEViewer\PEViewer.cpp(405,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  PEViewer.vcxproj -> H:\cpp_projects\PEViewer\Debug\PEViewer.exe
