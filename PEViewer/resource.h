@@ -60,7 +60,6 @@
 #define IDC_EDIT_RVACONFIG              1034
 #define IDC_EDIT_RVATLS                 1035
 #define IDC_EDIT_RVABOUNDIMPORT         1036
-#define IDC_BUTTON_EXPORT1              1037
 #define IDC_BUTTON_EXPORT               1037
 #define IDC_EDIT_INFO                   1038
 #define IDC_EDIT_RVADELAYIMPORT         1043
@@ -86,7 +85,6 @@
 #define IDC_BUTTON_IMPORT               1063
 #define IDC_BUTTON_RESOURCE             1064
 #define IDC_BUTTON_BASERELOC            1065
-#define IDC_BUTTON_BOUNDIMPORT          1066
 #define IDC_BUTTON_IAT                  1067
 #define IDC_STATIC                      -1
 

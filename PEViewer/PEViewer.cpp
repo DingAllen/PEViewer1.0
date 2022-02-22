@@ -26,19 +26,25 @@ HWND hListSection;
 LPVOID pFileBuffer;
 PIMAGE_HEADER_POINTERS pImageHeaders;
 
-CHAR info[65535];
+CHAR info[0x1000000];
 
 int flag = -1;
 enum {
     FLAG_EXPORT,
     FLAG_IMPORT,
     FLAG_RESOURCE,
-    FLAG_BASERELOC,
-    FLAG_BOUNDIMPORT,
-    FLAG_IAT
+    FLAG_BASERELOC
 };
 
 LV_ITEMW vitem;
+
+PSTR GetStrA(PWSTR wstr) {
+    int len = WideCharToMultiByte(CP_ACP, 0, wstr, wcslen(wstr), NULL, 0, NULL, NULL);
+    CHAR *m_char = new CHAR[len + 1];
+    WideCharToMultiByte(CP_ACP, 0, wstr, wcslen(wstr), m_char, len, NULL, NULL);
+    m_char[len] = '\0';
+    return m_char;
+}
 
 VOID AppendInfo(CHAR *str) {
     strcat(info, str);
@@ -66,7 +72,25 @@ INT_PTR CALLBACK InfoDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 
             switch (flag) {
                 case FLAG_EXPORT: {
-                    AppendInfo("导出表");
+
+                    PIMAGE_DATA_DIRECTORY DataDirectory = pImageHeaders->pOptionHeader->DataDirectory;
+
+                    if (DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress == 0) {
+                        AppendInfo("没有导出表，打个屁。");
+                        SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
+                        break;
+                    }
+
+                    PIMAGE_EXPORT_DIRECTORY pImageExportDirectory = (PIMAGE_EXPORT_DIRECTORY) RVAToPTR(pFileBuffer,
+                                                                                                       DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
+                    DWORD numberOfNames = pImageExportDirectory->NumberOfNames;
+                    PSTR *functionNames = (PSTR *) RVAToPTR(pFileBuffer, pImageExportDirectory->AddressOfNames);
+
+                    AppendInfo("打印导出表内的函数名：");
+                    for (DWORD i = 0; i < numberOfNames; i++) {
+                        sprintf(temp, "%s", (PSTR) RVAToPTR(pFileBuffer, (DWORD) functionNames[i]));
+                        AppendInfo(temp);
+                    }
                     SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
                     break;
                 }
@@ -130,22 +154,148 @@ INT_PTR CALLBACK InfoDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
                     break;
                 }
                 case FLAG_RESOURCE: {
-                    AppendInfo("资源表");
+                    AppendInfo("开始打印资源表");
+                    AppendInfo("");
+
+                    PIMAGE_DATA_DIRECTORY pImageDataDirectory = pImageHeaders->pOptionHeader->DataDirectory;
+                    PIMAGE_RESOURCE_DIRECTORY pImageResourceDirectory1 = (PIMAGE_RESOURCE_DIRECTORY) RVAToPTR(
+                            pFileBuffer,
+                            pImageDataDirectory[IMAGE_DIRECTORY_ENTRY_RESOURCE].VirtualAddress);
+                    WORD numberOfEntries1 =
+                            pImageResourceDirectory1->NumberOfIdEntries +
+                            pImageResourceDirectory1->NumberOfNamedEntries;
+                    PIMAGE_RESOURCE_DIRECTORY_ENTRY pImageResourceDirectoryEntry1 = (PIMAGE_RESOURCE_DIRECTORY_ENTRY) (
+                            pImageResourceDirectory1 + 1);
+
+                    sprintf(temp, "================================第一层（类型）：共%d条================================",
+                            numberOfEntries1);
+                    AppendInfo(temp);
+
+                    for (int i = 0; i < numberOfEntries1; i++) {
+                        if (pImageResourceDirectoryEntry1[i].NameIsString) {
+                            PIMAGE_RESOURCE_DIR_STRING_U dirStringU1 = (PIMAGE_RESOURCE_DIR_STRING_U) (
+                                    (DWORD) pImageResourceDirectory1 +
+                                    pImageResourceDirectoryEntry1[i].NameOffset);
+                            PWSTR name1 = (PWSTR) malloc(dirStringU1->Length * 2 + 2);
+                            memset(name1, 0, dirStringU1->Length * 2 + 2);
+                            memcpy(name1, dirStringU1->NameString, dirStringU1->Length * 2);
+                            sprintf(temp, "第一层（类型），第%d条--资源类型名称：%s", i + 1, GetStrA(name1));
+                            AppendInfo(temp);
+                        } else {
+                            WORD id1 = pImageResourceDirectoryEntry1[i].Id;
+                            sprintf(temp, "第一层（类型），第%d条--资源类型ID：%d", i + 1, id1);
+                            AppendInfo(temp);
+                        }
+                        PIMAGE_RESOURCE_DIRECTORY pImageResourceDirectory2 = (PIMAGE_RESOURCE_DIRECTORY) (
+                                (DWORD) pImageResourceDirectory1 + pImageResourceDirectoryEntry1[i].OffsetToDirectory);
+                        WORD numberOfEntries2 =
+                                pImageResourceDirectory2->NumberOfIdEntries +
+                                pImageResourceDirectory2->NumberOfNamedEntries;
+                        PIMAGE_RESOURCE_DIRECTORY_ENTRY pImageResourceDirectoryEntry2 = (PIMAGE_RESOURCE_DIRECTORY_ENTRY) (
+                                pImageResourceDirectory2 + 1);
+
+                        sprintf(temp, "===========================第%d条的第二层（编号）：共%d条===========================", i + 1,
+                                numberOfEntries2);
+                        AppendInfo(temp);
+
+                        for (int j = 0; j < numberOfEntries2; j++) {
+                            if (pImageResourceDirectoryEntry2[j].NameIsString) {
+                                PIMAGE_RESOURCE_DIR_STRING_U dirStringU2 = (PIMAGE_RESOURCE_DIR_STRING_U) (
+                                        (DWORD) pImageResourceDirectory1 +
+                                        pImageResourceDirectoryEntry2[j].NameOffset);
+                                PWSTR name2 = (PWSTR) malloc(dirStringU2->Length * 2 + 2);
+                                memset(name2, 0, dirStringU2->Length * 2 + 2);
+                                memcpy(name2, dirStringU2->NameString, dirStringU2->Length * 2);
+                                sprintf(temp, "第二层（编号），第%d条--名称：%s", j + 1, GetStrA(name2));
+                                AppendInfo(temp);
+                            } else {
+                                WORD id2 = pImageResourceDirectoryEntry2[j].Id;
+                                sprintf(temp, "第二层（编号），第%d条--ID：%d", j + 1, id2);
+                                AppendInfo(temp);
+                            }
+
+                            PIMAGE_RESOURCE_DIRECTORY pImageResourceDirectory3 = (PIMAGE_RESOURCE_DIRECTORY) (
+                                    (DWORD) pImageResourceDirectory1 +
+                                    pImageResourceDirectoryEntry2[j].OffsetToDirectory);
+                            WORD numberOfEntries3 =
+                                    pImageResourceDirectory3->NumberOfIdEntries +
+                                    pImageResourceDirectory3->NumberOfNamedEntries;
+                            PIMAGE_RESOURCE_DIRECTORY_ENTRY pImageResourceDirectoryEntry3 = (PIMAGE_RESOURCE_DIRECTORY_ENTRY) (
+                                    pImageResourceDirectory3 + 1);
+
+                            sprintf(temp, "================第%d条的第三层（代码页）：共%d条================", j + 1,
+                                    numberOfEntries3);
+                            AppendInfo(temp);
+
+                            for (int k = 0; k < numberOfEntries3; k++) {
+                                if (pImageResourceDirectoryEntry3[k].NameIsString) {
+                                    PIMAGE_RESOURCE_DIR_STRING_U dirStringU3 = (PIMAGE_RESOURCE_DIR_STRING_U) (
+                                            (DWORD) pImageResourceDirectory1 +
+                                            pImageResourceDirectoryEntry3[k].NameOffset);
+                                    PWSTR name3 = (PWSTR) malloc(dirStringU3->Length * 2 + 2);
+                                    memset(name3, 0, dirStringU3->Length * 2 + 2);
+                                    memcpy(name3, dirStringU3->NameString, dirStringU3->Length * 2);
+                                    sprintf(temp, "第三层（代码页），第%d条--名称：%s", k + 1, GetStrA(name3));
+                                    AppendInfo(temp);
+                                } else {
+                                    WORD id3 = pImageResourceDirectoryEntry3[k].Id;
+                                    sprintf(temp, "第三层（代码页），第%d条--ID：%d", k + 1, id3);
+                                    AppendInfo(temp);
+                                }
+
+                                PIMAGE_DATA_DIRECTORY dataEntryDirectory = (PIMAGE_DATA_DIRECTORY) (
+                                        (DWORD) pImageResourceDirectory1 +
+                                        pImageResourceDirectoryEntry3[k].OffsetToData);
+                                sprintf(temp, "VirtualAddress:%08lX", dataEntryDirectory->VirtualAddress);
+                                AppendInfo(temp);
+                                sprintf(temp, "Size:%08lX", dataEntryDirectory->Size);
+                                AppendInfo(temp);
+                            }
+
+                            AppendInfo("");
+                        }
+                        AppendInfo("");
+                    }
+
                     SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
                     break;
                 }
                 case FLAG_BASERELOC: {
-                    AppendInfo("重定位表");
-                    SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
-                    break;
-                }
-                case FLAG_BOUNDIMPORT: {
-                    AppendInfo("绑定导入表");
-                    SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
-                    break;
-                }
-                case FLAG_IAT: {
-                    AppendInfo("IAT表");
+
+                    PIMAGE_DATA_DIRECTORY DataDirectory = pImageHeaders->pOptionHeader->DataDirectory;
+
+                    if (DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress == 0) {
+                        AppendInfo("没有重定位表，打个屁。");
+                        SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
+                        break;
+                    }
+
+                    PIMAGE_BASE_RELOCATION pImageBaseRelocation = (PIMAGE_BASE_RELOCATION) RVAToPTR(pFileBuffer,
+                                                                                                    DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress);
+
+                    AppendInfo("开始打印重定位表：");
+                    while (pImageBaseRelocation->VirtualAddress != 0 && pImageBaseRelocation->SizeOfBlock != 0) {
+
+                        DWORD numberOfItems = (pImageBaseRelocation->SizeOfBlock - 8) / 2;
+                        WORD *items = (WORD *) ((DWORD) pImageBaseRelocation + 8);
+
+                        AppendInfo("========================================");
+                        sprintf(temp, "当前重定位表地址:0x%08lx", pImageBaseRelocation->VirtualAddress);
+                        AppendInfo(temp);
+                        sprintf(temp, "当前重定位表表项数:%lu", numberOfItems);
+                        AppendInfo(temp);
+                        AppendInfo("开始打印重定位表表项信息:");
+                        for (DWORD i = 0; i < numberOfItems; i++) {
+                            DWORD offset = items[i] & 0xFFF;
+                            DWORD rva = pImageBaseRelocation->VirtualAddress + offset;
+                            BYTE type = (BYTE) (items[i] >> 12);
+                            sprintf(temp, "第%d个表项:\tRVA:0x%08x\t属性值:0x%x", i, rva, type);
+                            AppendInfo(temp);
+                        }
+                        pImageBaseRelocation = (PIMAGE_BASE_RELOCATION) ((DWORD) pImageBaseRelocation +
+                                                                         pImageBaseRelocation->SizeOfBlock);
+                    }
+
                     SetDlgItemTextA(hDlg, IDC_EDIT_INFO, info);
                     break;
                 }
@@ -202,16 +352,6 @@ INT_PTR CALLBACK DirectoryDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
                 }
                 case IDC_BUTTON_BASERELOC: {
                     flag = FLAG_BASERELOC;
-                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_INFO), hDlg, InfoDlgProc);
-                    return TRUE;
-                }
-                case IDC_BUTTON_BOUNDIMPORT: {
-                    flag = FLAG_BOUNDIMPORT;
-                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_INFO), hDlg, InfoDlgProc);
-                    return TRUE;
-                }
-                case IDC_BUTTON_IAT: {
-                    flag = FLAG_IAT;
                     DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_DIALOG_INFO), hDlg, InfoDlgProc);
                     return TRUE;
                 }
@@ -480,7 +620,7 @@ VOID EnumProcess(HWND hListProcess) {
     memset(&vitem, 0, sizeof(LV_ITEM));
     vitem.mask = LVIF_TEXT;
 
-    vitem.pszText = TEXT("csrss.exe");
+    vitem.pszText = TEXT("现在能用的只有PE查看器，这边等后面写线程注入的时候再写");
     vitem.iItem = 0;
     vitem.iSubItem = 0;
     SendMessage(hListProcess, LVM_INSERTITEM, 0, (LPARAM) &vitem);
@@ -568,6 +708,8 @@ INT_PTR CALLBACK MainDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
         case WM_COMMAND: {
             switch (LOWORD(wParam)) {
                 case IDC_BUTTON_ABOUT: {
+
+                    DialogBox(hAppInstance, MAKEINTRESOURCE(IDD_ABOUTBOX), hDlg, About);
 
                     return TRUE;
                 }
